@@ -5,6 +5,12 @@ resource "aws_alb_target_group" "web_tg" {
   vpc_id   = aws_vpc.main.id
 }
 
+resource "aws_alb_target_group_attachment" "web_tg_attachment" {
+  target_group_arn = aws_alb_target_group.web_tg.arn
+  target_id        = aws_instance.web_server.id
+  port             = 80
+}
+
 resource "aws_alb" "web_alb" {
   name               = "web-alb"
   internal           = false
