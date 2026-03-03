@@ -104,6 +104,12 @@ resource "aws_vpc_security_group_ingress_rule" "ingress_ssh_rule_default" {
   cidr_ipv4         = "0.0.0.0/0"
 }
 
+resource "aws_vpc_security_group_egress_rule" "egress_rule_default" {
+  ip_protocol       = "-1"
+  security_group_id = aws_security_group.tf_security_grp.id
+  cidr_ipv4         = "0.0.0.0/0"
+}
+
 resource "aws_instance" "web_server" {
   ami           = var.ami_id
   instance_type = var.instance_type
@@ -111,13 +117,7 @@ resource "aws_instance" "web_server" {
 
   subnet_id = aws_subnet.main_public_subnet_a.id
 
-  user_data = <<-EOF
-              #!/bin/bash
-              sudo apt update
-              sudo apt install -y apache2
-              sudo systemctl start apache2
-              sudo systemctl enable apache2
-              EOF
+  user_data = file("scripts/httpd_init.sh")
 
   security_groups = [aws_security_group.tf_security_grp.id]
 
